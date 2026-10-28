@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FINDA</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a7a3a">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+body{background:#f5f5f7}
+header{background:#0a7a3a;color:white;padding:22px 15px;text-align:center}
+header h1{font-size:28px;letter-spacing:1px} header p{font-size:13px;opacity:.9;margin-top:6px}
+.search{padding:12px;background:white;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.search input{width:100%;padding:13px;border-radius:12px;border:1px solid #ddd;font-size:15px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:12px 10px}
+.cat{background:white;border:1.5px solid #0a7a3a;color:#0a7a3a;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap}
+.cat.active{background:#0a7a3a;color:white}
+.card{background:white;margin:10px;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.card h3{font-size:16px} .loc{font-size:12px;color:#666;margin:4px 0} .desc{font-size:13px;color:#333;margin:8px 0}
+.btn-wa{background:#25D366;color:white;padding:12px;width:100%;border-radius:12px;font-weight:800;font-size:14px;display:block;text-align:center;text-decoration:none;margin-top:8px}
+.add-btn{position:fixed;bottom:20px;right:20px;background:#0a7a3a;color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+<h1>FINDA</h1>
+<p>Find Everything in Motherwell • Veeplaas • Kamvelihle</p>
+</header>
+<div class="search"><input id="search" placeholder="Search: meat, shisanyama, hair..." onkeyup="render()"></div>
+<div class="cats" id="cats"></div>
+<div id="list"></div>
+<a class="add-btn" href="add.html">+</a>
+<script>
+const businesses=[
+{name:"Swa Ka Lova Meat",loc:"Veeplaas",cat:"Meat",desc:"Fresh braai packs, beef, pork, wors. Delivery daily.",wa:"27600000001"},
+{name:"Mama D's Shisanyama",loc:"NU2",cat:"Shisanyama",desc:"Pap & braai, chakalaka. Open till 10pm.",wa:"27600000002"},
+{name:"Kamvelihle Hair & Beauty",loc:"Kamvelihle",cat:"Hair",desc:"Braids, wig install, nails.",wa:"27600000003"},
+{name:"NU6 Spaza",loc:"NU6",cat:"Spaza",desc:"Bread, airtime, cold drinks.",wa:"27600000004"}
+];
+const categories=["All","Meat","Shisanyama","Hair","Spaza","Services"];
+let activeCat="All";
+function renderCats(){document.getElementById('cats').innerHTML=categories.map(c=>`<div class="cat ${c===activeCat?'active':''}" onclick="setCat('${c}')">${c}</div>`).join('');}
+function setCat(c){activeCat=c;renderCats();render();}
+function render(){
+let q=document.getElementById('search').value.toLowerCase();
+let filtered=businesses.filter(b=>{let mCat=activeCat==="All"||b.cat===activeCat;let mQ=b.name.toLowerCase().includes(q)||b.desc.toLowerCase().includes(q);return mCat&&mQ;});
+document.getElementById('list').innerHTML=filtered.map(b=>`<div class="card"><h3>${b.name}</h3><div class="loc">📍 ${b.loc} • ${b.cat}</div><div class="desc">${b.desc}</div><a class="btn-wa" href="https://wa.me/${b.wa}?text=Hi%20${encodeURIComponent(b.name)}%20-%20I%20found%20you%20on%20FINDA">💬 Order on WhatsApp</a></div>`).join('');
+}
+renderCats();render();
+</script>
+</body>
+</html>
