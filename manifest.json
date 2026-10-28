@@ -1,0 +1,9 @@
+{
+  "name": "FINDA",
+  "short_name": "FINDA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a7a3a",
+  "theme_color": "#0a7a3a",
+  "icons": []
+}
