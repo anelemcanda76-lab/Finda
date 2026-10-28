@@ -13,7 +13,7 @@ header{background:#0a7a3a;color:white;padding:22px 15px;text-align:center}
 header h1{font-size:28px} header p{font-size:13px;opacity:.9;margin-top:6px}
 .search{padding:12px;background:white;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .search input{width:100%;padding:13px;border-radius:12px;border:1px solid #ddd;font-size:15px}
-#map{height:300px;width:100%;background:#e5e5e5;z-index:1}
+#map{height:320px;width:100%;background:#e5e5e5;z-index:1}
 .map-bar{background:white;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
 .cats{display:flex;gap:8px;overflow-x:auto;padding:12px 10px;background:white}
 .cat{background:white;border:1.5px solid #0a7a3a;color:#0a7a3a;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap}
@@ -32,7 +32,7 @@ header h1{font-size:28px} header p{font-size:13px;opacity:.9;margin-top:6px}
 <header><h1>FINDA</h1><p>Find Everything in Motherwell • Veeplaas • Kamvelihle</p></header>
 <div class="search"><input id="search" placeholder="Search: meat, shisanyama, hair..." onkeyup="render()"></div>
 <div id="map"></div>
-<div class="map-bar"><span>📍 Businesses near you - tap pin for directions</span><a href="javascript:centerMap()" style="color:#0a7a3a;font-weight:700;text-decoration:none">Reset Map</a></div>
+<div class="map-bar"><span>📍 Tap pin for directions to shop</span><a href="javascript:centerMap()" style="color:#0a7a3a;font-weight:700;text-decoration:none">Reset Map</a></div>
 <div class="cats" id="cats"></div>
 <div id="list"></div>
 <a class="add-btn" href="add.html">+</a>
@@ -51,7 +51,7 @@ let activeCat="All";
 let map, markers=[];
 function initMap(){
   map = L.map('map').setView([-33.805, 25.605], 13);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',subdomains:'abcd',maxZoom:20}).addTo(map);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri © OpenStreetMap'}).addTo(map);
   renderMarkers(businesses);
 }
 function renderMarkers(list){markers.forEach(m=>map.removeLayer(m));markers=[];list.forEach((b)=>{let marker=L.marker([b.lat,b.lng]).addTo(map).bindPopup(`<b>${b.name}</b><br>${b.loc}<br><a href='https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}' target='_blank' style='color:#0a7a3a;font-weight:700'>Get Directions →</a>`);markers.push(marker);});}
