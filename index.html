@@ -3,59 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FINDA Motherwell - Businesses Only</title>
+<title>FINDA</title>
+<meta name="theme-color" content="#0a7a3a">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-body{font-family:Inter,system-ui,sans-serif;margin:0;background:#f8fafc}
-header{background:#16a34a;color:white;padding:14px;text-align:center;font-weight:800;font-size:18px;position:sticky;top:0}
-.cat-bar{display:flex;gap:8px;overflow-x:auto;padding:12px;background:white;border-bottom:1px solid #e2e8f0}
-.cat{padding:8px 14px;border-radius:20px;background:#f1f5f9;white-space:nowrap;cursor:pointer;font-size:13px;font-weight:600}
-.cat.active{background:#16a34a;color:white}
-.grid{padding:12px;display:grid;gap:12px}
-.card{background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);border:1px solid #e2e8f0}
-.card-top{padding:14px}
-.badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;background:#dcfce7;color:#166534;margin-bottom:6px}
-.muted{color:#64748b;font-size:13px;margin:4px 0}
-.desc{background:#f8fafc;padding:8px 10px;border-radius:8px;font-size:13px;margin:8px 0}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,sans-serif}
+body{background:#f5f5f7}
+header{background:#0a7a3a;color:white;padding:22px 15px;text-align:center}
+header h1{font-size:28px} header p{font-size:13px;opacity:.9;margin-top:6px}
+.search{padding:12px;background:white;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.search input{width:100%;padding:13px;border-radius:12px;border:1px solid #ddd;font-size:15px}
+#map{height:320px;width:100%;background:#e5e5e5;z-index:1}
+.map-bar{background:white;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding:12px 10px;background:white}
+.cat{background:white;border:1.5px solid #0a7a3a;color:#0a7a3a;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap}
+.cat.active{background:#0a7a3a;color:white}
+.card{background:white;margin:10px;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.loc{font-size:12px;color:#666;margin:4px 0} .desc{font-size:13px;color:#333;margin:8px 0;line-height:1.4}
 .btns{display:flex;gap:8px;margin-top:10px}
-.btn{flex:1;padding:10px;border-radius:10px;text-align:center;text-decoration:none;font-weight:700;font-size:13px}
-.btn-wa{background:#22c55e;color:white}
-.btn-dir{background:#f1f5f9;color:#0f172a}
+.btn-wa{flex:1;background:#25D366;color:white;padding:12px;border-radius:12px;font-weight:800;font-size:13px;text-align:center;text-decoration:none}
+.btn-map{flex:1;background:#111;color:white;padding:12px;border-radius:12px;font-weight:800;font-size:13px;text-align:center;text-decoration:none}
+.badge{font-size:11px;background:#e8f5e9;color:#0a7a3a;padding:5px 8px;border-radius:6px;display:inline-block;margin-top:6px}
+.add-btn{position:fixed;bottom:20px;right:20px;background:#0a7a3a;color:white;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;text-decoration:none;z-index:999}
+.admin-link{position:fixed;bottom:20px;left:20px;background:#111;color:white;padding:10px 14px;border-radius:20px;text-decoration:none;font-size:12px;z-index:999}
 </style>
 </head>
 <body>
-<header>FINDA • Motherwell Businesses Only</header>
-<div class="cat-bar" id="cats"></div>
-<div class="grid" id="grid"></div>
+<header><h1>FINDA</h1><p>Find Everything in Motherwell • Veeplaas • Kamvelihle</p></header>
+<div class="search"><input id="search" placeholder="Search: meat, shisanyama, hair, cleaning..." onkeyup="render()"></div>
+<div id="map"></div>
+<div class="map-bar"><span>📍 Tap pin for directions</span><a href="javascript:centerMap()" style="color:#0a7a3a;font-weight:700;text-decoration:none">Reset Map</a></div>
+<div class="cats" id="cats"></div>
+<div id="list"></div>
+<a class="add-btn" href="add.html">+</a>
+<a class="admin-link" href="admin.html">📊 Leads</a>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const businesses = [
-  {name:"Swa Ka Lova Meat", cat:"Meat", location:"Motherwell NU12", wa:"27684651485", desc:"Quality Braai Meat & Wors - Fresh daily", address:"Motherwell NU12, Gqeberha"},
-  {name:"Siya's fresh and clean cowlegs", cat:"Meat", location:"Kamvelihle, Mjondolo", wa:"27670813520", desc:"Fresh and Clean Cowlegs ready for cooking R30", address:"Kamvelihle, Mjondolo, Motherwell"},
-  {name:"Mama D's Shisanyama", cat:"Shisanyama", location:"Motherwell NU6", wa:"27731234567", desc:"Best Shisanyama & Pap - Weekends till late", address:"Motherwell NU6"},
-  {name:"Kamvelihle Hair & Beauty", cat:"Hair", location:"Kamvelihle", wa:"27821234567", desc:"Braids, Weaves, Nails - Book now", address:"Kamvelihle, Motherwell"},
-  {name:"Thozama Home Services", cat:"Services", location:"NU9 Mjondolo", wa:"27735962226", desc:"House Cleaning & Laundry R150", address:"NU9 Mjondolo, Motherwell"}
+const MY_ADMIN_NUMBER = "27826613785";
+const businesses=[
+{name:"Swa Ka Lova Meat - Veeplaas",loc:"Veeplaas",cat:"Meat",desc:"Fresh braai packs, beef, pork, wors. Delivery daily.",wa:"27826613785",lat:-33.8145,lng:25.5920,address:"Veeplaas, Motherwell"},
+{name:"Siya's fresh and clean cowlegs",loc:"Kamvelihle, Mjondolo",cat:"Meat",desc:"Fresh and Clean Cowlegs ready for cooking R30",wa:"27670813520",lat:-33.7910,lng:25.6150,address:"Kamvelihle, Mjondolo, Motherwell"},
+{name:"Thozama Jekwa Ndiyafumaneka - Premium Home Services",loc:"NU9 Mjondolo",cat:"Services",desc:"Ukuhlamba Impahla: R150 Encinci | R200 Eninzi. UkuCoca Indlu: R200/Day Indlu, R150/Day Flat. Ukugcina Abantwana: R100/Day. Clean Trusted Affordable.",wa:"27735962226",lat:-33.8155,lng:25.5990,address:"Motherwell NU9 - Mjondolo - 0735962226"},
+{name:"Mama D's Shisanyama",loc:"NU2 Motherwell",cat:"Shisanyama",desc:"Pap & braai, chakalaka. Open till 10pm.",wa:"27826613785",lat:-33.8040,lng:25.6050,address:"NU2 Motherwell"},
+{name:"Kamvelihle Hair & Beauty",loc:"Kamvelihle",cat:"Hair",desc:"Braids, wig install, nails.",wa:"27826613785",lat:-33.7895,lng:25.6170,address:"Kamvelihle"},
+{name:"NU6 Spaza & Groceries",loc:"NU6",cat:"Spaza",desc:"Bread, airtime, cold drinks, essentials.",wa:"27826613785",lat:-33.8120,lng:25.6030,address:"NU6 Motherwell"}
 ];
-const categories = ["All","Meat","Shisanyama","Hair","Spaza","Services"];
-let activeCat = "All";
-function renderCats(){
-  document.getElementById('cats').innerHTML = categories.map(c=>`<div class="cat ${activeCat===c?'active':''}" onclick="setCat('${c}')">${c}</div>`).join('');
+const categories=["All","Meat","Shisanyama","Hair","Spaza","Services"];
+let activeCat="All";
+let map, markers=[];
+function initMap(){
+  map = L.map('map').setView([-33.81, 25.599], 13);
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri © OpenStreetMap'}).addTo(map);
+  renderMarkers(businesses);
 }
-function setCat(c){activeCat=c; renderCats(); renderGrid();}
-function renderGrid(){
-  const filtered = activeCat==="All" ? businesses : businesses.filter(b=>b.cat===activeCat);
-  document.getElementById('grid').innerHTML = filtered.map(b=>`
-    <div class="card"><div class="card-top">
-        <span class="badge">${b.cat}</span>
-        <h3>${b.name}</h3>
-        <div class="muted">📍 ${b.location}</div>
-        <div class="desc">${b.desc}</div>
-        <div class="btns">
-          <a class="btn btn-wa" href="https://wa.me/${b.wa}?text=Hi%20${encodeURIComponent(b.name)}%20I%20found%20you%20on%20FINDA" target="_blank">WhatsApp</a>
-          <a class="btn btn-dir" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}" target="_blank">Directions</a>
-        </div>
-      </div></div>
-  `).join('');
-}
-renderCats(); renderGrid();
+function renderMarkers(list){markers.forEach(m=>map.removeLayer(m));markers=[];list.forEach((b)=>{let marker=L.marker([b.lat,b.lng]).addTo(map).bindPopup(`<b>${b.name}</b><br>${b.loc}<br><a href='https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}' target='_blank' style='color:#0a7a3a;font-weight:700'>Get Directions →</a>`);markers.push(marker);});}
+function centerMap(){map.setView([-33.81, 25.599], 13);}
+function renderCats(){document.getElementById('cats').innerHTML=categories.map(c=>`<div class="cat ${c===activeCat?'active':''}" onclick="setCat('${c}')">${c}</div>`).join('');}
+function setCat(c){activeCat=c;renderCats();render();}
+function orderViaAdmin(idx){let b=businesses[idx];let leads=JSON.parse(localStorage.getItem('finda_leads')||'[]');leads.push({time:new Date().toLocaleString(), business:b.name, loc:b.loc});localStorage.setItem('finda_leads',JSON.stringify(leads));let msg=`FINDA NEW ORDER:%0A%0ACustomer wants: ${b.name}%0ALocation: ${b.loc}%0AAddress: ${b.address}%0A%0APlease connect me.`;window.location.href=`https://wa.me/${b.wa}?text=${msg}`;}
+function render(){let q=document.getElementById('search').value.toLowerCase();let filtered=businesses.filter(b=>{let mCat=activeCat==="All"||b.cat===activeCat;let mQ=b.name.toLowerCase().includes(q)||b.desc.toLowerCase().includes(q)||b.loc.toLowerCase().includes(q);return mCat&&mQ;});renderMarkers(filtered);document.getElementById('list').innerHTML=filtered.map((b)=>`<div class="card"><h3>${b.name}</h3><div class="loc">📍 ${b.loc} • ${b.cat}</div><div class="desc">${b.desc}</div><div class="badge">📍 ${b.address}</div><div class="btns"><a class="btn-wa" href="javascript:orderViaAdmin(${businesses.indexOf(b)})">💬 Order on WhatsApp</a><a class="btn-map" href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}" target="_blank">🗺️ Directions</a></div></div>`).join('');}
+renderCats();initMap();render();
 </script>
 </body>
 </html>
