@@ -3,73 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FINDA - NU1-NU12, Veeplaas, Kamvelihle</title>
+<title>FINDA</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-body{margin:0;font-family:system-ui,Arial;background:#f5f7fb}
-header{background:#0f172a;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:20}
-header h1{margin:0;font-size:22px} header h1 span{color:#25D366}
-#map{height:360px;width:100%;background:#e5e7eb;z-index:1}
-.search{padding:10px;background:#fff;position:sticky;top:60px;z-index:10;box-shadow:0 2px 6px rgba(0,0,0,.05)}
-.search input{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:15px}
-#list{padding:10px;display:grid;gap:12px;max-width:700px;margin:0 auto}
-.card{background:#fff;padding:14px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #0f172a}
-.card.new{border-left-color:#25D366;background:#f0fdf4}
-.wa{background:#25D366;color:#fff;padding:9px 16px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block;margin-top:8px}
-#fab{position:fixed;bottom:20px;right:20px;width:62px;height:62px;background:#25D366;color:#fff;border-radius:50%;border:none;font-size:30px;box-shadow:0 4px 16px rgba(0,0,0,.3);z-index:30;cursor:pointer}
-#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:40;padding:16px;align-items:center;justify-content:center}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+body{background:#f8fafc}
+header{background:#fff;padding:12px 16px;position:sticky;top:0;z-index:20;border-bottom:1px solid #eef2f7}
+#map{height:340px;width:100%;background:#e5e7eb;z-index:1}
+.search-wrap{padding:12px 16px;background:#fff;position:sticky;top:60px;z-index:10;border-bottom:1px solid #f1f5f9}
+.search-wrap input{width:100%;padding:13px 16px;border:1px solid #e2e8f0;border-radius:12px;font-size:14px;background:#f8fafc}
+.search-wrap input:focus{outline:none;border-color:#0f172a;background:#fff}
+#list{padding:12px 12px 100px 12px;display:grid;gap:14px;max-width:700px;margin:0 auto}
+.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid #f1f5f9}
+.card h2{font-size:17px;line-height:1.3;margin-bottom:6px;color:#0f172a;font-weight:800}
+.card .meta{font-size:13px;color:#64748b;display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.card .desc{font-size:14px;color:#334155;line-height:1.4;margin-bottom:12px}
+.card .loc-tag{display:inline-flex;align-items:center;gap:4px;background:#f0fdf4;color:#15803d;border:1px solid #dcfce7;padding:6px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:12px}
+.btn-row{display:flex;gap:10px}
+.btn-wa{flex:1;background:#22c55e;color:#fff;border:none;padding:12px;border-radius:12px;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn-dir{flex:1;background:#0f172a;color:#fff;border:none;padding:12px;border-radius:12px;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+#fab{position:fixed;bottom:24px;right:20px;width:58px;height:58px;background:#22c55e;color:#fff;border-radius:50%;border:none;font-size:28px;font-weight:300;box-shadow:0 6px 20px rgba(34,197,94,.4);z-index:30;cursor:pointer}
+#leads{position:fixed;bottom:24px;left:16px;background:#0f172a;color:#fff;padding:10px 14px;border-radius:20px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;z-index:30;border:1px solid #1e293b}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;padding:16px;align-items:center;justify-content:center}
 #modal.show{display:flex}
-.box{background:#fff;width:100%;max-width:390px;border-radius:14px;padding:20px;max-height:90vh;overflow:auto}
-.box input,.box select,.box textarea{width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;margin:6px 0;font-size:14px}
-.box select{border:2px solid #0f172a;font-weight:800;background:#fffbe6}
-.btn-submit{width:100%;background:#0f172a;color:#fff;padding:13px;border:none;border-radius:9px;font-weight:800;margin-top:10px}
-.btn-close{width:100%;background:#eee;padding:10px;border:none;border-radius:9px;margin-top:8px}
-.badge{font-size:10px;padding:3px 7px;border-radius:20px;background:#0f172a;color:#fff;margin-left:6px}
-.badge.new{background:#25D366}
+.box{background:#fff;width:100%;max-width:400px;border-radius:20px;padding:22px;max-height:90vh;overflow:auto}
+.box input,.box select,.box textarea{width:100%;padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin:6px 0;font-size:14px}
+.box select{border:2px solid #0f172a;font-weight:800;background:#fffbeb}
 </style>
 </head>
 <body>
-<header><h1>FINDA <span>.</span></h1><div style="font-size:12px;opacity:.85">NU1 to NU12, Veeplaas, Kamvelihle - Founding Businesses</div></header>
+<header>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<h1 style="font-size:22px;font-weight:900">FINDA<span style="color:#22c55e">.</span></h1>
+<div style="font-size:11px;color:#64748b">NU1-NU12 • Veeplaas • Kamvelihle</div>
+</div>
+</header>
+
 <div id="map"></div>
-<div class="search"><input id="search" placeholder="Search kota, cow feet, hair, spaza..."></div>
+
+<div class="search-wrap">
+<input id="search" placeholder="Search: meat, shisanyama, hair, cleaning...">
+</div>
+
 <div id="list"></div>
 
+<div id="leads">📊 Leads</div>
 <button id="fab" onclick="document.getElementById('modal').classList.add('show')">+</button>
 
 <div id="modal"><div class="box">
-<h3 style="margin:0 0 8px 0">List Your Business - FREE</h3>
-<p style="font-size:12px;color:#666;margin-bottom:10px">Your business will be added to FINDA map</p>
+<h3 style="margin-bottom:4px">List Your Business - FREE</h3>
+<p style="font-size:12px;color:#64748b;margin-bottom:12px">Get found by NU1-NU12 customers</p>
 <input id="n_name" placeholder="Business Name *">
-<label style="font-size:11px;font-weight:900;display:block;margin-top:6px">CATEGORY * VERY IMPORTANT - REQUIRED</label>
+<label style="font-size:11px;font-weight:900;margin-top:8px;display:block">CATEGORY * REQUIRED</label>
 <select id="n_cat">
 <option value="">-- SELECT CATEGORY * --</option>
+<option value="Meat">🥩 Meat</option>
 <option value="Food">🍔 Food</option>
 <option value="Shisanyama">🔥 Shisanyama</option>
-<option value="Meat">🥩 Meat / Braai</option>
 <option value="Services">🔧 Services</option>
-<option value="Beauty">💇 Beauty / Hair</option>
-<option value="Spaza">🏪 Spaza Shop</option>
+<option value="Beauty">💇 Beauty</option>
+<option value="Spaza">🏪 Spaza</option>
 <option value="Other">Other</option>
 </select>
 <input id="n_loc" placeholder="Location * e.g. Kamvelihle, Mjondolo">
+<input id="n_loc_full" placeholder="Full Address * e.g. Kamvelihle, Mjondolo, Motherwell">
 <input id="n_wa" placeholder="WhatsApp * e.g. 0826613785">
-<input id="n_price" placeholder="Price * e.g. R30 cleaned">
-<textarea id="n_desc" placeholder="What do you sell? *"></textarea>
-<button class="btn-submit" onclick="sendBiz()">Submit via WhatsApp to FINDA</button>
-<button class="btn-close" onclick="document.getElementById('modal').classList.remove('show')">Cancel</button>
+<input id="n_price" placeholder="Price * e.g. R30">
+<textarea id="n_desc" placeholder="Description * e.g. Fresh and Clean Cowlegs ready for cooking"></textarea>
+<button onclick="sendBiz()" style="width:100%;background:#0f172a;color:#fff;padding:13px;border:none;border-radius:12px;font-weight:800;margin-top:10px">Submit via WhatsApp</button>
+<button onclick="document.getElementById('modal').classList.remove('show')" style="width:100%;background:#f1f5f9;padding:11px;border:none;border-radius:12px;margin-top:8px;font-weight:600">Cancel</button>
 </div></div>
 
 <script>
 var businesses = [
-  // NEW - TODAY
-  {Name:"Siya's Fresh and Clean Cow Feet", Location:"Kamvelihle, Mjondolo", Cat:"Food", Desc:"Cleaned, fresh and ready to cook cow feet. Fresh daily, clean and ready.", Price:"R30 cleaned, fresh and ready to cook", Wa:"0826613785", lat:-33.815, lng:25.601, isNew:true},
-  // FOUNDING - ORIGINAL V1 - NEVER REMOVED AGAIN
-  {Name:"Swa Ka Lova Meat - Veeplaas", Location:"Veeplaas, Near Motherwell", Cat:"Meat", Desc:"Fresh braai packs, beef, pork, wors, offal. Best prices in Veeplaas.", Price:"Braai packs from R100", Wa:"0820000001", lat:-33.812, lng:25.595, isOld:true},
-  {Name:"Mama D's Shisanyama", Location:"NU2, Motherwell", Cat:"Shisanyama", Desc:"Best pap & braai, chakalaka, mogodu. Weekend special.", Price:"Pap & meat R80", Wa:"0820000002", lat:-33.802, lng:25.582, isOld:true},
-  {Name:"Kamvelihle Hair & Beauty", Location:"Kamvelihle", Cat:"Beauty", Desc:"Braids, wig install, nails, eyelashes. Book now.", Price:"Braids from R200", Wa:"0820000003", lat:-33.818, lng:25.605, isOld:true},
-  {Name:"NU6 Spaza & Groceries", Location:"NU6 Motherwell", Cat:"Spaza", Desc:"Bread, airtime, cold drinks, paraffin, basics. Open 7am-10pm.", Price:"Airtime & groceries", Wa:"0820000004", lat:-33.808, lng:25.589, isOld:true},
-  {Name:"Motherwell Car Wash & Services", Location:"NU3, Motherwell", Cat:"Services", Desc:"Car wash, tyre repair, small repairs, oil.", Price:"Car wash R50", Wa:"0820000005", lat:-33.803, lng:25.58, isOld:true},
-  // FOUNDING - V2
-  {Name:"Home of Traditional Food", Location:"Motherwell NU6 OPPOSITE HOME AFFAIRS", Cat:"Food", Desc:"Burger,kota,lusu,sbindi,hot dogs and chips, mogodu.", Price:"Kota from R30", Wa:"0737894849", lat:-33.8095, lng:25.588, isOld:true},
-  {Name:"Kasi Kota Spot", Location:"Motherwell NU2", Cat:"Food", Desc:"Best kota in NU2, Russian, chips, atchar
+  {Name:"Siya's fresh and clean cowlegs", Location:"Kamvelihle, Mjondolo", FullLoc:"Kamvelihle, Mjondolo, Motherwell", Cat:"Meat", Desc:"Fresh and Clean Cowlegs ready for cooking R30", Price:"R30", Wa:"0826613785", lat:-33.815, lng:25.601},
+  {Name:"Thozama Jekwa Ndiyafumaneka - Premium Home Services", Location:"NU9 Mjondolo", FullLoc:"Motherwell NU9 - Mjondolo - 0735962226", Cat:"Services", Desc:"Ukuhlamba Impahla: R150 Encinci | R200 Eninzi. UkuCoca Indlu: R200/Day Indlu, R150/Day Flat. Ukugcina Abantwana: R100/Day. Clean Trusted Affordable.", Price:"From R100/Day", Wa:"0735962226", lat:-33.814, lng:25.603},
+  {Name:"Mama D's Shisanyama", Location:"NU2 Motherwell", FullLoc:"NU2 Motherwell", Cat:"Shisanyama", Desc:"Pap & braai, chakalaka. Open till 10pm.", Price:"", Wa:"0820000002", lat:-33.802, lng:25.582},
+  {Name:"Swa Ka Lova Meat - Veeplaas", Location:"Veeplaas", FullLoc:"Veeplaas, Near Motherwell", Cat:"Meat", Desc:"Fresh braai packs, beef, pork, wors, offal. Best prices.", Price:"Braai packs from R100", Wa:"0820000001", lat:-33.812, lng:25.595},
+  {Name:"Home of Traditional Food", Location:"NU6 Motherwell", FullLoc:"Motherwell NU6 OPPOSITE HOME AFFAIRS", Cat:"Food", Desc:"Burger,kota,lusu,sbindi,hot dogs and chips, mogodu.", Price:"Kota from R30", Wa:"0737894849", lat:-33.8095, lng:25.588},
+  {Name:"Kamvelihle Hair & Beauty", Location:"Kamvelihle", FullLoc:"Kamvelihle", Cat:"Beauty", Desc:"Braids, wig install, nails, eyelashes.", Price:"Braids from R200", Wa:"0820000003", lat:-33.818, lng:25.605},
+  {Name:"Kasi Kota Spot", Location:"Motherwell NU2", FullLoc:"Motherwell NU2", Cat:"Food", Desc:"Best kota in NU2, Russian, chips, atchar.", Price:"Kota R35", Wa:"0821234567", lat:-33.8025, lng:25.5825},
+  {Name:"Veeplaas Hair Salon", Location:"Veeplaas", FullLoc:"Veeplaas", Cat:"Beauty", Desc:"Braids, nails, relaxer, wigs.", Price:"Braids R180", Wa:"0781234567", lat:-33.81, lng:25.58},
+  {Name:"NU6 Spaza & Groceries", Location:"NU6 Motherwell", FullLoc:"NU6 Motherwell", Cat:"Spaza", Desc:"Bread, airtime, cold drinks, paraffin, basics. Open 7am-10pm.", Price:"", Wa:"0820000004", lat:-33.808, lng:25.589},
+  {Name:"Motherwell Car Wash & Services", Location:"NU3 Motherwell", FullLoc:"NU3, Motherwell", Cat:"Services", Desc:"Car wash, tyre repair, small repairs, oil.", Price:"Car wash R50", Wa:"0820000005", lat:-33.803, lng:25.58}
+];
+
+// FIXED MAP - CartoDB tiles will NOT show yellow blocked error like OSM did
+var map = L.map('map').setView([-33.8095, 25.588], 13);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution:'© CARTO',
+  subdomains:'abcd',
+  maxZoom:20
+}).addTo(map);
+
+businesses.forEach(b=>{
+  L.circleMarker([b.lat,b.lng],{radius:7,fillColor:'#22c55e',color:'#fff',weight:2,fillOpacity:1}).addTo(map).bindPopup(b.Name);
+});
+
+function render(){
+  var q=document.getElementById('search').value.toLowerCase();
+  var html="";
+  businesses.forEach(b=>{
+    if((b.Name+" "+b.Location+" "+b.Cat+" "+b.Desc).toLowerCase().indexOf(q)==-1) return;
+    html+=`
+    <div class="card">
+      <h2>${b.Name}</h2>
+      <div class="meta">📍 ${b.Location} • ${b.Cat}</div>
+      <div class="desc">${b.Desc}</div>
+      <div class="loc-tag">📍 ${b.FullLoc||b.Location}</div>
+      <div class="btn-row">
+        <a class="btn-wa" href="https://wa.me/27${b.Wa.replace(/^0/,'')}?text=Hi, I found ${encodeURIComponent(b.Name)} on FINDA" target="_blank">💬 Order on WhatsApp</a>
+        <a class="btn-dir" href="https://www.google.com/maps/dir/?api=1&destination=${b.lat},${b.lng}" target="_blank">🗺️ Directions</a>
+      </div>
+    </div>`;
+  });
+  document.getElementById('list').innerHTML=html;
+}
+
+function sendBiz(){
+  var name=document.getElementById('n_name').value.trim();
+  var cat=document.getElementById('n_cat').value;
+  var loc=document.getElementById('n_loc').value.trim();
+  var full=document.getElementById('n_loc_full').value.trim();
+  var wa=document.getElementById('n_wa').value.trim();
+  if(!name||!loc||!wa){alert("Fill Name, Location, WhatsApp");return;}
+  if(!cat){alert("CATEGORY REQUIRED!");return;}
+  var price=document.getElementById('n_price').value;
+  var desc=document.getElementById('n_desc').value;
+  var msg="NEW FINDA BUSINESS:\nName: "+name+"\nCat: "+cat+"\nLoc: "+loc+"\nFull: "+full+"\nWa: "+wa+"\nPrice: "+price+"\nDesc: "+desc;
+  window.open("https://wa.me/27737894849?text="+encodeURIComponent(msg),"_blank");
+  document.getElementById('modal').classList.remove('show');
+}
+document.getElementById('search').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
