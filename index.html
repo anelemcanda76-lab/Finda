@@ -1,42 +1,101 @@
-9<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FINDA - Find Anything in Motherwell</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<title>FINDA</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto}
-body{background:#f5f7fb;color:#111;padding-bottom:90px}
-header{background:#0f172a;color:white;padding:16px 20px;position:sticky;top:0;z-index:20}
-header h1{font-size:22px} header h1 span{color:#25D366} header p{font-size:13px;opacity:.8;margin-top:2px}
-#map{height:42vh;width:100%;z-index:1;border-bottom:3px solid #0f172a}
-.search-wrap{padding:12px 16px;background:white;box-shadow:0 2px 10px rgba(0,0,0,0.05);position:sticky;top:66px;z-index:10}
-.search-wrap input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px;font-size:15px}
-.cats{display:flex;gap:8px;overflow:auto;padding:10px 16px;background:white}
-.cats button{white-space:nowrap;padding:8px 14px;border-radius:20px;border:1px solid #e5e7eb;background:white;cursor:pointer;font-size:13px}
-.cats button.active{background:#0f172a;color:white}
-#list{padding:12px 16px;display:grid;gap:12px;max-width:700px;margin:0 auto}
-.card{background:white;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #eef2f7}
-.card h3{font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.tag{font-size:11px;background:#f1f5f9;padding:3px 8px;border-radius:10px;color:#475569;font-weight:600;white-space:nowrap}
-.card p{font-size:13px;color:#475569;margin-top:4px;line-height:1.4}
-.btns{display:flex;gap:8px;margin-top:10px}
-.wa-btn{flex:1;text-align:center;background:#25D366;color:white;padding:9px 10px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px}
-.map-btn{flex:1;text-align:center;background:#0f172a;color:white;padding:9px 10px;border-radius:9px;text-decoration:none;font-weight:700;font-size:13px}
-.loc{color:#64748b;font-size:12px}
-.count{padding:8px 16px;font-size:12px;color:#64748b;max-width:700px;margin:0 auto}
-.price{font-weight:800;color:#0f172a;margin-top:6px}
-.new-badge{background:#25D366;color:white;font-size:10px;padding:2px 6px;border-radius:8px;margin-left:6px}
-#fab{position:fixed;bottom:20px;right:20px;width:62px;height:62px;background:#25D366;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;box-shadow:0 4px 20px rgba(37,211,102,0.45);cursor:pointer;z-index:30;border:none}
-#modal{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;align-items:center;justify-content:center;z-index:40;padding:16px}
-#modal.show{display:flex}
-.modal-box{background:white;width:100%;max-width:400px;border-radius:18px;padding:20px;max-height:90vh;overflow:auto}
-.modal-box h2{font-size:18px;margin-bottom:4px}
-.modal-box p.small{font-size:12px;color:#64748b;margin-bottom:12px}
-.modal-box label.cat-label{font-size:12px;font-weight:800;margin-bottom:4px;display:block;color:#0f172a}
-.modal-box input,.modal-box select,.modal-box textarea{width:100%;padding:11px 12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px;font-size:14px}
-.modal-box select.cat-select{border:2px solid #0f172a;font-weight:700;background:#fffbe6}
-.modal-box textarea{resize:none;height:70px}
-.modal-box button.submit{width:100%;background:#0f172a;color:white;padding:12px;border-radius:10px;border:none;font-weight
+body{margin:0;font-family:Arial;background:#f5f5f5}
+header{background:#0f172a;color:#fff;padding:15px}
+#map{height:280px;background:#ddd;width:100%}
+#search{width:100%;padding:12px;border:1px solid #ddd}
+.card{background:#fff;margin:10px;padding:12px;border-radius:10px}
+.wa{background:#25D366;color:#fff;padding:8px 12px;border-radius:6px;text-decoration:none;display:inline-block;margin-top:8px}
+#fab{position:fixed;bottom:20px;right:20px;width:60px;height:60px;background:#25D366;color:#fff;border-radius:50%;border:none;font-size:30px;z-index:999}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;padding:20px}
+#modal.show{display:flex;align-items:center;justify-content:center}
+.box{background:#fff;padding:20px;border-radius:12px;width:100%;max-width:350px}
+.box input,.box select{width:100%;padding:10px;margin:5px 0;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+<body>
+<header><h1 style="margin:0">FINDA <span style="color:#25D366">.</span></h1><small>NU1-NU12, Veeplaas, Kamvelihle</small></header>
+<div id="map"></div>
+<div style="padding:10px;background:#fff"><input id="search" placeholder="Search kota, cow feet, hair..."></div>
+<div id="list"></div>
+
+<button id="fab" onclick="document.getElementById('modal').classList.add('show')">+</button>
+
+<div id="modal">
+<div class="box">
+<h3 style="margin-top:0">List Your Business - FREE</h3>
+<input id="f_name" placeholder="Business Name *">
+<select id="f_cat" style="border:2px solid #000;font-weight:bold">
+<option value="">-- CATEGORY * REQUIRED --</option>
+<option value="Food">Food</option>
+<option value="Services">Services</option>
+<option value="Beauty">Beauty</option>
+<option value="Spaza">Spaza</option>
+<option value="Other">Other</option>
+</select>
+<input id="f_loc" placeholder="Location * e.g. Kamvelihle, Mjondolo">
+<input id="f_wa" placeholder="WhatsApp * 082...">
+<input id="f_price" placeholder="Price e.g. R30">
+<input id="f_desc" placeholder="What do you sell?">
+<button onclick="submitBiz()" style="width:100%;padding:12px;background:#0f172a;color:#fff;border:none;border-radius:8px;margin-top:10px;font-weight:bold">Submit via WhatsApp</button>
+<button onclick="document.getElementById('modal').classList.remove('show')" style="width:100%;padding:10px;background:#eee;border:none;border-radius:8px;margin-top:8px">Cancel</button>
+</div>
+</div>
+
+<script>
+// SHOW ERROR INSTEAD OF WHITE PAGE
+window.onerror = function(msg){
+  document.getElementById('list').innerHTML = "<div style='padding:20px;color:red'>Error: "+msg+" - but businesses below still work</div>" + document.getElementById('list').innerHTML;
+}
+
+const businesses=[
+{Name:"Siya's Fresh and Clean Cow Feet",Location:"Kamvelihle, Mjondolo",Address:"Kamvelihle, Mjondolo",Cat:"Food",Desc:"Cleaned, fresh and ready to cook",Price:"R30 cleaned, fresh and ready to cook",Wa:"0826613785",lat:-33.815,lng:25.601},
+{Name:"Home of Traditional Food",Location:"Motherwell NU6 OPPOSITE HOME AFFAIRS",Address:"Motherwell NU6",Cat:"Food",Desc:"Burger,kota,lusu,sbindi,hot dogs and chips",Wa:"0737894849",lat:-33.8095,lng:25.588},
+{Name:"Sears Fresh and Clean",Location:"Motherwell",Address:"Motherwell",Cat:"Services",Desc:"Laundry",Wa:"0820000000",lat:-33.804,lng:25.585},
+{Name:"Cowfit",Location:"Motherwell",Address:"Motherwell",Cat:"Services",Desc:"Fitness",Wa:"0820000000",lat:-33.806,lng:25.587}
+];
+
+let map;
+try{
+  map = L.map('map').setView([-33.806,25.586],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  businesses.forEach(b=>{ L.marker([b.lat,b.lng]).addTo(map).bindPopup(b.Name); });
+}catch(e){
+  document.getElementById('map').innerHTML="<div style='padding:40px;text-align:center'>Map loading... businesses below work</div>";
+}
+
+function render(){
+  let q=document.getElementById('search').value.toLowerCase();
+  document.getElementById('list').innerHTML=businesses.filter(b=>(b.Name+" "+b.Location).toLowerCase().includes(q)).map(b=>`
+    <div class="card">
+      <b>${b.Name}</b> <span style="background:#eee;padding:2px 6px;border-radius:6px;font-size:11px">${b.Cat}</span>
+      <div>📍 ${b.Location}</div>
+      <div>${b.Desc}</div>
+      ${b.Price?`<div style="font-weight:bold">${b.Price}</div>`:''}
+      <a class="wa" href="https://wa.me/27${b.Wa.replace(/^0/,'')}" target="_blank">WhatsApp ${b.Wa}</a>
+    </div>
+  `).join('');
+}
+function submitBiz(){
+  let n=document.getElementById('f_name').value;
+  let c=document.getElementById('f_cat').value;
+  let l=document.getElementById('f_loc').value;
+  let w=document.getElementById('f_wa').value;
+  if(!n||!l||!w){alert("Fill Name, Location, WhatsApp");return;}
+  if(!c){alert("CATEGORY REQUIRED! Please select");return;}
+  let msg=`NEW BUSINESS: ${n} | Cat: ${c} | Loc: ${l} | Wa: ${w}`;
+  window.open(`https://wa.me/27737894849?text=${encodeURIComponent(msg)}`,'_blank');
+  document.getElementById('modal').classList.remove('show');
+}
+document.getElementById('search').addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
